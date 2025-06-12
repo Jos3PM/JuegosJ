@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx"
+            fx:controller="upeu.edu.pe.ajedres.controller.CheckersController"
+            prefHeight="600.0" prefWidth="600.0">
+    <GridPane fx:id="boardGrid" layoutX="50.0" layoutY="50.0" prefHeight="500.0" prefWidth="500.0">
+        <!-- The board will be dynamically populated with buttons or rectangles -->
+    </GridPane>
+    <Label layoutX="50.0" layoutY="20.0" text="Juego de Damas">
+        <font>
+            <Font size="18.0"/>
+        </font>
+    </Label>
+</AnchorPane>
