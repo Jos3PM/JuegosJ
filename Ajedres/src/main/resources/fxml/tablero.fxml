@@ -4,22 +4,74 @@
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 
-<GridPane xmlns="http://javafx.com/javafx"
-          xmlns:fx="http://javafx.com/fxml"
-          fx:controller="upeu.edu.pe.ajedres.controller.TableroController"
-          hgap="0" vgap="0"
-          alignment="CENTER">
+<BorderPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="upeu.edu.pe.ajedres.controller.TableroController"
+           prefWidth="1000" prefHeight="700">
     
     <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
+        <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
 
-    <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="0">
-        <Label text="Ajedrez" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-        <GridPane fx:id="tablero" hgap="0" vgap="0" maxWidth="640" maxHeight="640"/>
-        <HBox spacing="10" alignment="CENTER">
-            <Button text="Nueva Partida" onAction="#nuevaPartida"/>
-        </HBox>
-    </VBox>
+    <!-- Título y controles superiores -->
+    <top>
+        <VBox spacing="10" alignment="CENTER">
+            <Label text="♔ AJEDREZ ♛" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #8B4513;"/>
+            <HBox spacing="20" alignment="CENTER">
+                <Label fx:id="turnoLabel" text="Turno: Blancas" 
+                       style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Label fx:id="estadoJuegoLabel" text="Juego en progreso" 
+                       style="-fx-font-size: 14px;"/>
+            </HBox>
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="Nueva Partida" onAction="#nuevaPartida" 
+                        style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Button text="Ayuda" onAction="#mostrarAyuda"
+                        style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;"/>
+            </HBox>
+        </VBox>
+    </top>
 
-</GridPane> 
+    <!-- Tablero de ajedrez -->
+    <center>
+        <VBox alignment="CENTER" spacing="10">
+            <Label text="a    b    c    d    e    f    g    h" 
+                   style="-fx-font-family: monospace; -fx-font-size: 12px;"/>
+            <HBox alignment="CENTER" spacing="5">
+                <VBox spacing="0" alignment="CENTER">
+                    <Label text="8" style="-fx-font-family: monospace; -fx-font-size: 12px;"/>
+                    <Label text="7" style="-fx-font-family: monospace; -fx-font-size: 12px;"/>
+                    <Label text="6" style="-fx-font-family: monospace; -fx-font-size: 12px;"/>
+                    <Label text="5" style="-fx-font-family: monospace; -fx-font-size: 12px;"/>
+                    <Label text="4" style="-fx-font-family: monospace; -fx-font-size: 12px;"/>
+                    <Label text="3" style="-fx-font-family: monospace; -fx-font-size: 12px;"/>
+                    <Label text="2" style="-fx-font-family: monospace; -fx-font-size: 12px;"/>
+                    <Label text="1" style="-fx-font-family: monospace; -fx-font-size: 12px;"/>
+                </VBox>
+                <GridPane fx:id="tablero" hgap="0" vgap="0" 
+                         style="-fx-border-color: black; -fx-border-width: 2;"/>
+            </HBox>
+        </VBox>
+    </center>
+
+    <!-- Panel de historial -->
+    <right>
+        <VBox spacing="10" prefWidth="250">
+            <padding>
+                <Insets left="20"/>
+            </padding>
+            <Label text="📜 Historial de Movimientos" 
+                   style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <ListView fx:id="historialList" prefHeight="400" 
+                     style="-fx-font-family: monospace; -fx-font-size: 12px;"/>
+            <VBox spacing="5">
+                <Label text="Leyenda:" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                <Label text="♔ Rey    ♕ Reina" style="-fx-font-size: 10px;"/>
+                <Label text="♖ Torre  ♗ Alfil" style="-fx-font-size: 10px;"/>
+                <Label text="♘ Caballo ♙ Peón" style="-fx-font-size: 10px;"/>
+                <Label text="x = Captura" style="-fx-font-size: 10px;"/>
+            </VBox>
+        </VBox>
+    </right>
+
+</BorderPane>

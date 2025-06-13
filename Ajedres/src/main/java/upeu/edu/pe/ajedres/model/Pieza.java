@@ -2,10 +2,36 @@ package upeu.edu.pe.ajedres.model;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.layout.StackPane;
 
 public class Pieza {
     public enum Tipo {
-        PEON, TORRE, CABALLO, ALFIL, REINA, REY
+        PEON("♟", "♙"), 
+        TORRE("♜", "♖"), 
+        CABALLO("♞", "♘"), 
+        ALFIL("♝", "♗"), 
+        REINA("♛", "♕"), 
+        REY("♚", "♔");
+        
+        private final String simboloNegro;
+        private final String simboloBlanco;
+        
+        Tipo(String simboloNegro, String simboloBlanco) {
+            this.simboloNegro = simboloNegro;
+            this.simboloBlanco = simboloBlanco;
+        }
+        
+        public String getSimbolo() {
+            return name().substring(0, 1);
+        }
+        
+        public String getSimboloUnicode(Color color) {
+            return color == Color.NEGRO ? simboloNegro : simboloBlanco;
+        }
     }
 
     public enum Color {
@@ -14,7 +40,7 @@ public class Pieza {
 
     private Tipo tipo;
     private Color color;
-    private ImageView imagen;
+    private StackPane imagen;
     private int fila;
     private int columna;
 
@@ -23,21 +49,30 @@ public class Pieza {
         this.color = color;
         this.fila = fila;
         this.columna = columna;
-        cargarImagen();
+        crearImagen();
     }
 
-    private void cargarImagen() {
-        String rutaImagen = "/images/" + color.toString().toLowerCase() + "_" + 
-                          tipo.toString().toLowerCase() + ".png";
-        try {
-            Image image = new Image(getClass().getResourceAsStream(rutaImagen));
-            imagen = new ImageView(image);
-            imagen.setFitWidth(60);
-            imagen.setFitHeight(60);
-        } catch (Exception e) {
-            System.err.println("Error al cargar la imagen: " + rutaImagen);
-            e.printStackTrace();
-        }
+    private void crearImagen() {
+        imagen = new StackPane();
+        
+        // Crear un círculo de fondo
+        Circle fondo = new Circle(25);
+        fondo.setFill(color == Color.BLANCO ? 
+                     javafx.scene.paint.Color.LIGHTGRAY : 
+                     javafx.scene.paint.Color.DARKGRAY);
+        fondo.setStroke(javafx.scene.paint.Color.BLACK);
+        fondo.setStrokeWidth(1);
+        
+        // Crear el texto con el símbolo Unicode
+        Text simbolo = new Text(tipo.getSimboloUnicode(color));
+        simbolo.setFont(Font.font("Arial", 30));
+        simbolo.setFill(color == Color.BLANCO ? 
+                       javafx.scene.paint.Color.WHITE : 
+                       javafx.scene.paint.Color.BLACK);
+        
+        imagen.getChildren().addAll(fondo, simbolo);
+        imagen.setMaxSize(50, 50);
+        imagen.setPrefSize(50, 50);
     }
 
     public boolean esMovimientoValido(int filaDestino, int columnaDestino) {
@@ -108,9 +143,9 @@ public class Pieza {
     // Getters y setters
     public Tipo getTipo() { return tipo; }
     public Color getColor() { return color; }
-    public ImageView getImagen() { return imagen; }
+    public StackPane getImagen() { return imagen; }
     public int getFila() { return fila; }
     public void setFila(int fila) { this.fila = fila; }
     public int getColumna() { return columna; }
     public void setColumna(int columna) { this.columna = columna; }
-} 
+}

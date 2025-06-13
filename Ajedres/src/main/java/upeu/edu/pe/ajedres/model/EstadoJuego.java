@@ -7,11 +7,15 @@ public class EstadoJuego {
     private Pieza[][] tablero;
     private Pieza.Color turnoActual;
     private List<String> historialMovimientos;
+    private boolean juegoTerminado;
+    private String ganador;
 
     public EstadoJuego() {
         tablero = new Pieza[8][8];
         turnoActual = Pieza.Color.BLANCO;
         historialMovimientos = new ArrayList<>();
+        juegoTerminado = false;
+        ganador = null;
         inicializarTablero();
     }
 
@@ -50,15 +54,22 @@ public class EstadoJuego {
     }
 
     public boolean moverPieza(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino) {
+        if (juegoTerminado) {
+            return false;
+        }
+
         Pieza pieza = tablero[filaOrigen][columnaOrigen];
         
         if (pieza == null || pieza.getColor() != turnoActual) {
             return false;
         }
 
-        if (!pieza.esMovimientoValido(filaDestino, columnaDestino)) {
+        if (!esMovimientoValido(filaOrigen, columnaOrigen, filaDestino, columnaDestino)) {
             return false;
         }
+
+        // Guardar la pieza capturada para el historial
+        Pieza piezaCapturada = tablero[filaDestino][columnaDestino];
 
         // Realizar el movimiento
         tablero[filaDestino][columnaDestino] = pieza;
@@ -66,36 +77,141 @@ public class EstadoJuego {
         pieza.setFila(filaDestino);
         pieza.setColumna(columnaDestino);
 
-        // Registrar el movimiento
-        String movimiento = String.format("%s,%d%d,%d%d", 
-            pieza.getTipo().toString(),
-            filaOrigen, columnaOrigen,
-            filaDestino, columnaDestino);
+        // Registrar el movimiento en el historial
+        String movimiento = crearNotacionMovimiento(pieza, filaOrigen, columnaOrigen, 
+                                                   filaDestino, columnaDestino, piezaCapturada);
         historialMovimientos.add(movimiento);
 
         // Cambiar el turno
         turnoActual = (turnoActual == Pieza.Color.BLANCO) ? 
                      Pieza.Color.NEGRO : Pieza.Color.BLANCO;
 
+        // Verificar si el juego ha terminado
+        verificarFinJuego();
+
         return true;
     }
 
-    public Pieza[][] getTablero() {
-        return tablero;
+    private boolean esMovimientoValido(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino) {
+        // Verificar límites del tablero
+        if (filaDestino < 0 || filaDestino >= 8 || columnaDestino < 0 || columnaDestino >= 8) {
+            return false;
+        }
+
+        Pieza pieza = tablero[filaOrigen][columnaOrigen];
+        Pieza piezaDestino = tablero[filaDestino][columnaDestino];
+
+        // No se puede capturar una pieza del mismo color
+        if (piezaDestino != null && piezaDestino.getColor() == pieza.getColor()) {
+            return false;
+        }
+
+        // Verificar si el movimiento es válido para la pieza
+        if (!pieza.esMovimientoValido(filaDestino, columnaDestino)) {
+            return false;
+        }
+
+        // Verificar si el camino está libre (excepto para el caballo)
+        if (pieza.getTipo() != Pieza.Tipo.CABALLO) {
+            if (!esCaminoLibre(filaOrigen, columnaOrigen, filaDestino, columnaDestino)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
-    public Pieza.Color getTurnoActual() {
-        return turnoActual;
+    private boolean esCaminoLibre(int filaOrigen, int columnaOrigen, int filaDestino, int columnaDestino) {
+        int deltaFila = Integer.signum(filaDestino - filaOrigen);
+        int deltaColumna = Integer.signum(columnaDestino - columnaOrigen);
+        
+        int filaActual = filaOrigen + deltaFila;
+        int columnaActual = columnaOrigen + deltaColumna;
+        
+        while (filaActual != filaDestino || columnaActual != columnaDestino) {
+            if (tablero[filaActual][columnaActual] != null) {
+                return false;
+            }
+            filaActual += deltaFila;
+            columnaActual += deltaColumna;
+        }
+        
+        return true;
     }
 
-    public List<String> getHistorialMovimientos() {
-        return historialMovimientos;
+    private String crearNotacionMovimiento(Pieza pieza, int filaOrigen, int columnaOrigen, 
+                                         int filaDestino, int columnaDestino, Pieza piezaCapturada) {
+        StringBuilder sb = new StringBuilder();
+        
+        // Número de movimiento
+        int numeroMovimiento = (historialMovimientos.size() / 2) + 1;
+        if (pieza.getColor() == Pieza.Color.BLANCO) {
+            sb.append(numeroMovimiento).append(". ");
+        }
+        
+        // Tipo de pieza (excepto peón)
+        if (pieza.getTipo() != Pieza.Tipo.PEON) {
+            sb.append(pieza.getTipo().getSimbolo());
+        }
+        
+        // Posición de origen (para peones solo si hay captura)
+        if (pieza.getTipo() == Pieza.Tipo.PEON && piezaCapturada != null) {
+            sb.append((char)('a' + columnaOrigen));
+        }
+        
+        // Captura
+        if (piezaCapturada != null) {
+            sb.append("x");
+        }
+        
+        // Posición de destino
+        sb.append((char)('a' + columnaDestino));
+        sb.append(8 - filaDestino);
+        
+        return sb.toString();
     }
+
+    private void verificarFinJuego() {
+        // Verificar si hay jaque mate o tablas
+        // Por simplicidad, solo verificamos si quedan reyes
+        boolean reyBlancoVivo = false;
+        boolean reyNegroVivo = false;
+        
+        for (int fila = 0; fila < 8; fila++) {
+            for (int columna = 0; columna < 8; columna++) {
+                Pieza pieza = tablero[fila][columna];
+                if (pieza != null && pieza.getTipo() == Pieza.Tipo.REY) {
+                    if (pieza.getColor() == Pieza.Color.BLANCO) {
+                        reyBlancoVivo = true;
+                    } else {
+                        reyNegroVivo = true;
+                    }
+                }
+            }
+        }
+        
+        if (!reyBlancoVivo) {
+            juegoTerminado = true;
+            ganador = "Negro";
+        } else if (!reyNegroVivo) {
+            juegoTerminado = true;
+            ganador = "Blanco";
+        }
+    }
+
+    // Getters y setters
+    public Pieza[][] getTablero() { return tablero; }
+    public Pieza.Color getTurnoActual() { return turnoActual; }
+    public List<String> getHistorialMovimientos() { return historialMovimientos; }
+    public boolean isJuegoTerminado() { return juegoTerminado; }
+    public String getGanador() { return ganador; }
 
     public void reiniciar() {
         tablero = new Pieza[8][8];
         turnoActual = Pieza.Color.BLANCO;
         historialMovimientos.clear();
+        juegoTerminado = false;
+        ganador = null;
         inicializarTablero();
     }
-} 
+}
