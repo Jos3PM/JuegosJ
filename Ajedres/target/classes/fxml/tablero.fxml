@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="upeu.edu.pe.ajedres.controller.TableroController"
+          hgap="0" vgap="0"
+          alignment="CENTER">
+    
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="0">
+        <Label text="Ajedrez" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+        <GridPane fx:id="tablero" hgap="0" vgap="0" maxWidth="640" maxHeight="640"/>
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Nueva Partida" onAction="#nuevaPartida"/>
+        </HBox>
+    </VBox>
+
+</GridPane> 
